@@ -11,8 +11,7 @@ public class db_config {
 	private static String db_password = "";
 	private static String db_name = "hostel_management";
 	private static String db_host = "localhost";
-//	call the gui from the main class u llo do kor i do?
-	//please do
+
 	public static void connect_to_database(){
 		try{
 			conn = DriverManager.getConnection("jdbc:mysql://"+ db_host +"/"+ db_name +"", db_username, db_password);
@@ -41,20 +40,12 @@ public class db_config {
 				preparedStmt.setInt (i, Integer.parseInt(data.get(i)));
 			}catch(NumberFormatException e)
 			{
-				/* If parameter is not String */
+				/* If parameter is not Integer */
 				preparedStmt.setString (i, data.get(i));
 			}
 		}
 		preparedStmt.execute();
 	}
-	
-//public static ResultSet get_student(String s) throws SQLException {
-		
-		//PreparedStatement ps = conn.prepareStatement("Select * from student where student_id=?;");
-		//ps.setString(1, s);
-		//ResultSet rs = ps.executeQuery();
-		//return rs;
-	//}
 
 public static ResultSet getData_operation(String name, String table_name) throws SQLException {
 	// TODO Auto-generated method stub
@@ -64,9 +55,9 @@ public static ResultSet getData_operation(String name, String table_name) throws
 	}else if(table_name == "faculty") {
 		query="Select * from faculty where name like ?;";
 	}else if(table_name == "room") {
-		query = "Select s.student_id,s.name,r.room_no,r.hostel_id from student s,room_allot_student r where s.student_id=r.student_id and s.name like ?;";
-	}else if(table_name == "student_fees") {
-		query = "select sf.student_id,s.name,sf.monthly_status,sf.payment_date from student s, student_fees sf where sf.student_id=s.student_id and s.name like ?;";
+		query = "Select s.student_id,s.name,r.room_no,r.hostel_id, r.is_deleted from student s,allot_student r where s.student_id=r.student_id and s.name like ?;";
+	}else if(table_name == "fees") {
+		query = "select sf.student_id,s.name,sf.month_year,sf.payment_date from student s,fees sf where sf.student_id=s.student_id and s.name like ?;";
 	}
 	else {
 		System.out.println("Encountered new table name please handle accordingly");
@@ -89,7 +80,10 @@ public static ResultSet delete_operation(String id, String table_name) throws SQ
 		query="Select * from student where student_id = ?;";
 	}else if(table_name == "faculty") {
 		query="Select * from faculty where faculty_id = ?;";
-	}else {
+	}else if(table_name == "allot_student") {
+		query = "Select student_id, hostel_id, room_no, is_deleted from allot_student where student_id =?;";
+	}
+	else {
 		System.out.println("Encountered new table name please handle accordingly");
 		System.exit(1);
 	}
@@ -110,17 +104,27 @@ public static ResultSet room_op(String query) throws SQLException{
 	return rs;
 }
 
-//public static ResultSet fees(String query) throws SQLException{
+public static ResultSet fees(String query) throws SQLException{
 
-	//PreparedStatement ps = conn.prepareStatement(query);
-	//ResultSet rs = ps.executeQuery();
+	System.out.println(query);
+	PreparedStatement ps = conn.prepareStatement(query);
+	ResultSet rs = ps.executeQuery();
 	
-	///return rs;
-//}
+	return rs;
+}
 
 
 public static void update_operation(String query) throws SQLException{
 	Statement st = conn.createStatement();
+	System.out.println("query is "+query);
 	st.executeUpdate(query);
  }
+
+public static ResultSet retireve_data(String query) throws Exception {
+	
+	PreparedStatement ps = conn.prepareStatement(query);
+	ResultSet rs = ps.executeQuery();
+	
+	return rs;
+}
 }
